@@ -6,6 +6,7 @@ import json
 import numpy as np
 import lime
 import lime.lime_tabular
+from pathlib import Path
 
 
 # Кэшируем загрузку модели для оптимизации
@@ -14,29 +15,67 @@ def load_predictor():
     """Загрузка предиктора с кэшированием"""
     return ChurnPredictor()
 
+
 class ChurnPredictor:
-    def __init__(self, model_path='model/churn_model.pkl',
-                 scaler_path='model/scaler.pkl',
-                 feature_info_path='model/feature_info.pkl',
-                 mappings_path='model/mappings.pkl',
-                 training_data_for_lime='data/training_data_for_lime.npy',
-                 feature_names='data/feature_names.json'):
+    def __init__(self):
+        # Определяем базовую директорию проекта
+        self.base_dir = Path(__file__).parent.parent  # Поднимаемся на уровень выше от текущего файла
+
+        # Определяем пути к файлам
+        self.model_path = self.base_dir / 'model' / 'churn_model.pkl'
+        self.scaler_path = self.base_dir / 'model' / 'scaler.pkl'
+        self.feature_info_path = self.base_dir / 'model' / 'feature_info.pkl'
+        self.mappings_path = self.base_dir / 'model' / 'mappings.pkl'
+        self.training_data_path = self.base_dir / 'data' / 'training_data_for_lime.npy'
+        self.feature_names_path = self.base_dir / 'data' / 'feature_names.json'
+
+        # Проверяем существование файлов перед загрузкой
+        self._check_files_exist()
 
         # Загрузка всех сохраненных компонентов
-        self.model = joblib.load(model_path)
-        self.scaler = joblib.load(scaler_path)
-        self.training_data = np.load(training_data_for_lime)
+        self.model = joblib.load(self.model_path)
+        self.scaler = joblib.load(self.scaler_path)
+        self.training_data = np.load(self.training_data_path)
 
-        with open(feature_info_path, 'rb') as f:
+        with open(self.feature_info_path, 'rb') as f:
             self.feature_info = pickle.load(f)
 
-        with open(mappings_path, 'rb') as f:
+        with open(self.mappings_path, 'rb') as f:
             self.mappings = pickle.load(f)
 
-        with open(feature_names, 'r') as f:
+        with open(self.feature_names_path, 'r') as f:
             self.feature_names = json.load(f)
 
         self.explainer = self._load_and_create_explainer()
+
+    def _check_files_exist(self):
+        """Проверяет существование всех необходимых файлов"""
+        files_to_check = [
+            (self.model_path, "Модель"),
+            (self.scaler_path, "Скейлер"),
+            (self.feature_info_path, "Информация о признаках"),
+            (self.mappings_path, "Маппинги"),
+            (self.training_data_path, "Обучающие данные для LIME"),
+            (self.feature_names_path, "Названия признаков")
+        ]
+
+        missing_files = []
+        for file_path, file_desc in files_to_check:
+            if not file_path.exists():
+                missing_files.append(f"{file_desc}: {file_path}")
+
+        if missing_files:
+            error_msg = "❌ Не найдены следующие файлы:\n" + "\n".join(missing_files)
+            st.error(error_msg)
+
+            # Показываем текущую директорию для отладки
+            st.info(f"Текущая директория: {Path.cwd()}")
+            st.info(
+                f"Содержимое папки model: {list((self.base_dir / 'model').glob('*')) if (self.base_dir / 'model').exists() else 'папка не найдена'}")
+            st.info(
+                f"Содержимое папки data: {list((self.base_dir / 'data').glob('*')) if (self.base_dir / 'data').exists() else 'папка не найдена'}")
+
+            raise FileNotFoundError(f"Отсутствуют файлы: {missing_files}")
 
     def _load_and_create_explainer(self):
         # Создаем explainer заново
@@ -49,9 +88,9 @@ class ChurnPredictor:
             sample_around_instance=True,
             random_state=42
         )
-
         return explainer
 
+    # ... остальные методы остаются без изменений ...
     def preprocess_data(self, input_data):
         """
         Предобработка новых данных так же, как при обучении
@@ -174,7 +213,7 @@ class ChurnPredictor:
 
         # Добавляем процент от общей важности
         importance_df['importance_percent'] = (
-                    importance_df['importance'] / importance_df['importance'].sum() * 100).round(2)
+                importance_df['importance'] / importance_df['importance'].sum() * 100).round(2)
 
         # Добавляем кумулятивный процент
         importance_df['cumulative_percent'] = importance_df['importance_percent'].cumsum()
@@ -201,7 +240,3 @@ class ChurnPredictor:
         )
 
         return exp.as_list(label=1)
-
-
-
-

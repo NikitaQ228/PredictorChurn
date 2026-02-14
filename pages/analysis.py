@@ -4,6 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 from predict_churn import load_predictor
 from plotly.subplots import make_subplots
+from pathlib import Path
 
 
 def show_feature_importance():
@@ -510,7 +511,8 @@ def main():
     """, unsafe_allow_html=True)
     st.markdown("---")
 
-    df = pd.read_excel('data\E Commerce Dataset.xlsx', sheet_name='E Comm', usecols='A:T')
+    data_path = Path(__file__).parent.parent / 'data' / 'E Commerce Dataset.xlsx'
+    df = pd.read_excel(data_path, sheet_name='E Comm', usecols='A:T')
 
     # Отображение информации о датасете
     display_dataset_info(df)
