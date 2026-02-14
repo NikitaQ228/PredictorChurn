@@ -19,7 +19,7 @@ def load_predictor():
 class ChurnPredictor:
     def __init__(self):
         # Определяем базовую директорию проекта
-        self.base_dir = Path(__file__).parent.parent  # Поднимаемся на уровень выше от текущего файла
+        self.base_dir = Path(__file__).parent
 
         # Определяем пути к файлам
         self.model_path = self.base_dir / 'model' / 'churn_model.pkl'

@@ -118,7 +118,7 @@ def show_feature_importance():
                 ]
             )
 
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width='stretch')
 
         with col2:
             st.subheader("Detailed information")
@@ -144,7 +144,7 @@ def show_feature_importance():
                     "importance_percent": "Importance (%)",
                     "cumulative_percent": "Cumulative %"
                 },
-                use_container_width=True,
+                width='stretch',
                 height = 410
             )
 
@@ -262,7 +262,7 @@ def display_dataset_info(df):
         # Отображаем датафрейм
         st.dataframe(
             df[display_cols].head(n_rows),
-            use_container_width=True,
+            width='stretch',
             height=300
         )
 
@@ -274,7 +274,7 @@ def display_dataset_info(df):
                 'Unique values': df.nunique(),
                 'Skipped %': (df.isnull().sum() / len(df) * 100).round(2)
             })
-            st.dataframe(col_stats, use_container_width=True)
+            st.dataframe(col_stats, width='stretch')
 
     with tab2:
         st.subheader("🔄 Customer churn analysis")
@@ -314,7 +314,7 @@ def display_dataset_info(df):
                 ]
             )
 
-            st.plotly_chart(fig_pie, use_container_width=True)
+            st.plotly_chart(fig_pie, width='stretch')
 
         with col2:
             # Детальная статистика по оттоку
@@ -401,7 +401,7 @@ def display_dataset_info(df):
                     "Total": st.column_config.NumberColumn(format="%d"),
                     "Churn %": st.column_config.NumberColumn(format="%.1f%%")
                 },
-                use_container_width=True
+                width='stretch'
             )
 
         # Визуализация
@@ -449,7 +449,7 @@ def display_dataset_info(df):
 
         fig_bar.update_xaxes(tickangle=45)
 
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar, width='stretch')
 
         # Числовые характеристики
         st.subheader("📊 Statistics based on numerical characteristics")
@@ -482,7 +482,7 @@ def display_dataset_info(df):
             stats_df.columns = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max']
             stats_df = stats_df.round(2)
 
-            st.dataframe(stats_df, use_container_width=True)
+            st.dataframe(stats_df, width='stretch')
 
 
 def main():
