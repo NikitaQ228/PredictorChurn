@@ -12,15 +12,8 @@ def show_feature_importance():
 
     st.markdown("""
         <h2 style='text-align: center;'>
-            Random Forest Classifier
+            XGBoost Classifier
         </h2>
-        """, unsafe_allow_html=True)
-
-    # Центрированная подпись снизу
-    st.markdown("""
-        <p style='text-align: center; font-size: 14px;'>
-            Accuracy: 98%
-        </p>
         """, unsafe_allow_html=True)
 
     # Загружаем модель
@@ -52,8 +45,8 @@ def show_feature_importance():
                     showscale=False,
                     line=dict(width=1)
                 ),
-                text=top_10['importance_percent'].round(1),
-                texttemplate='%{text}%',
+                text=top_10['importance_percent'],
+                texttemplate='%{text:.1f}%',
                 textposition='auto',
                 textfont=dict(size=12),
                 hovertemplate='<b>%{y}</b><br>Importance: %{x:.1f}%<br>Cumulative %: %{customdata:.1f}%<extra></extra>',
@@ -73,6 +66,7 @@ def show_feature_importance():
                 paper_bgcolor='rgba(0,0,0,0)',
                 xaxis=dict(
                     title='Importance (%)',
+                    tickformat='.1f',
                     title_font=dict(size=14),
                     tickfont=dict(size=12),
                     showgrid=True,
@@ -86,36 +80,7 @@ def show_feature_importance():
                     autorange='reversed'
                 ),
                 margin=dict(l=10, r=10, t=60, b=40),
-                height=550,
-                shapes=[
-                    dict(
-                        type='line',
-                        x0=top_10['importance_percent'].mean(),
-                        y0=-0.5,
-                        x1=top_10['importance_percent'].mean(),
-                        y1=len(top_10) - 0.5,
-                        line=dict(
-                            width=2,
-                            dash='dash'
-                        )
-                    )
-                ],
-                annotations=[
-                    dict(
-                        x=top_10['importance_percent'].mean(),
-                        y=len(top_10) - 1,
-                        text=f'{top_10["importance_percent"].mean():.1f}%',
-                        showarrow=True,
-                        arrowhead=2,
-                        arrowsize=1,
-                        arrowwidth=2,
-                        font=dict(size=11),
-                        borderwidth=1,
-                        borderpad=4,
-                        ax=20,
-                        ay=-30
-                    )
-                ]
+                height=550
             )
 
             st.plotly_chart(fig2, width='stretch')

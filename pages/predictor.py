@@ -209,7 +209,7 @@ def create_ecommerce_customer_form():
             # Делаем предсказание
             predictor = load_predictor()
             prediction_result = predictor.predict_with_details(form_data)
-            prediction_explain = predictor.local_explain_lime(form_data)
+            prediction_explain = predictor.local_explain_shap(form_data)
 
             # Добавляем новое предсказание в историю
             st.session_state.predictions_history.append({
@@ -356,7 +356,7 @@ def display_prediction(prediction_entry, index):
                     annotation['y'] = 1.05  # Move closer to plots
                     annotation['font']['size'] = 16  # Slightly larger
 
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, key=f"shap_{index}")
 
 
 
